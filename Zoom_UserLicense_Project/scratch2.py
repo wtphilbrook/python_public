@@ -1,7 +1,7 @@
 import csv
 import time
 import datetime
-#
+
 # # # 
 # 
 # The 4 March @ 11:43am EST push has a working script for two of the requirements. I've hand-checked the data to verify.
@@ -11,15 +11,17 @@ import datetime
 # For the time being, I've included the neccessary files in this directory.
 #
 # Here's the plan: 
-# Make a list of users who have the licensed version of zoom (done-ish, see the last block of code)
+# Make a list of users who have the licensed version of zoom (done)
 # Make a list of users with meetings over 45 minutes (done)
 # Make a list of users with meetings that have 4+ participants (done)
 # If a licensed user does not fall into either of the two requirement groups, they are not using the 
 # functionality (excl outside users, still have to figure that out)
 #
 # To do:
-# Define a function to edit the incoming CSV
+# Define a function to edit the incoming CSV and remove blank lines (done)
+# Ignore the header on CSVs (done)
 # I also want to explore using the Zoom API to further automate this, so nobody has to plop scripts in a directory for this to run.
+# Find a better way to input files rather than hardcoding the names in the script.
 #
 # # # 
 
@@ -30,6 +32,7 @@ cleaned_meeting_data = 'cleaned_data.csv'
 
 
 # Grab the users and their licenses from a zoom output
+# Luckily this report doesn't have a header or blank lines, so I don't have to edit it.
 with open(user_file) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=',')
     userslic = {}
@@ -40,9 +43,8 @@ with open(user_file) as csvfile:
         if col[10] == "Licensed":
             liccount += 1
 
-
-# Grab a list of users and the duration of their zoom meeting.
-# Find any meeting longer than 45 minutes and create a dict with them and the user's email
+# Convert the meeting_data csv into the cleaned_meeting_data csv, which removes all blank lines. This also
+# preserves the original CSV in case you need it for some reason.
 
 with open(meeting_data) as in_file:
     with open(cleaned_meeting_data, 'w') as out_file:
@@ -50,6 +52,10 @@ with open(meeting_data) as in_file:
         for row in csv.reader(in_file):
             if row:
                 writer.writerow(row)
+
+# Grab a list of users and the duration of their zoom meeting.
+# Skip the first row (headers)
+# Find any meeting longer than 45 minutes and create a dict with them and the user's email.
 
 with open(cleaned_meeting_data) as csvfile:
     meetingCSV = csv.reader(csvfile, delimiter=',')
@@ -60,7 +66,9 @@ with open(cleaned_meeting_data) as csvfile:
             meetings_over_45[col[3]] = col[10]
 
 # Similar to the above block, check the meeting list and see if a user has meetings with over 3 people. 
+# Skip the first row (headers)
 # If they DO, add them to the usersparts dictionary.
+
 with open(cleaned_meeting_data) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=',')
     usersparts = {}
@@ -70,14 +78,15 @@ with open(cleaned_meeting_data) as csvfile:
             #Column 0 is email, Column 10 is license type
             usersparts.update( {col[3] : col[11]} )
 
+
+# 
 # This block will check the list of user licenses versus the list of meetings over 45 minutes.
 # If a user is NOT in the meetings_over_45 dict AND their dict value is Licensed, they are a licensed user
 # not using 1 of the requirements for licensed users.
 #
-# Added another check for usersparts to see if they have meetings over 4 users or not
-#
-# Added date/time to the top of the report
+# It also prints out the final report, including time and number of licenses used/reclaimable
 # 
+
 print("")
 start_date = meeting_data.split('_')[1]
 end_date = meeting_data.split('_')[2].split('.')[0]
