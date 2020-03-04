@@ -26,6 +26,7 @@ import datetime
 #Importing files
 user_file = 'zoomus_users.csv'
 meeting_data = 'meetinglistdetails_20200201_20200301.csv'
+cleaned_meeting_data = 'cleaned_data.csv'
 
 
 # Grab the users and their licenses from a zoom output
@@ -42,8 +43,17 @@ with open(user_file) as csvfile:
 
 # Grab a list of users and the duration of their zoom meeting.
 # Find any meeting longer than 45 minutes and create a dict with them and the user's email
-with open(meeting_data) as csvfile:
+
+with open(meeting_data) as in_file:
+    with open(cleaned_meeting_data, 'w') as out_file:
+        writer = csv.writer(out_file)
+        for row in csv.reader(in_file):
+            if row:
+                writer.writerow(row)
+
+with open(cleaned_meeting_data) as csvfile:
     meetingCSV = csv.reader(csvfile, delimiter=',')
+    next(meetingCSV)
     meetings_over_45 = {}
     for col in meetingCSV:
         if int(col[10]) > 45:
@@ -51,9 +61,10 @@ with open(meeting_data) as csvfile:
 
 # Similar to the above block, check the meeting list and see if a user has meetings with over 3 people. 
 # If they DO, add them to the usersparts dictionary.
-with open('meetinglistdetails_20200201_20200301.csv') as csvfile:
+with open(cleaned_meeting_data) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=',')
     usersparts = {}
+    next(usersCSV)
     for col in usersCSV:
         if int(col[11]) > 3:
             #Column 0 is email, Column 10 is license type
