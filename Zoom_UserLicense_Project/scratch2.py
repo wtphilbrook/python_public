@@ -1,7 +1,8 @@
 import csv
 import time
 import datetime
-
+import os
+import re
 # # # 
 # 
 # The 4 March @ 11:43am EST push has a working script for two of the requirements. I've hand-checked the data to verify.
@@ -25,11 +26,23 @@ import datetime
 #
 # # # 
 
-#Importing files
-user_file = 'zoomus_users.csv'
-meeting_data = 'meetinglistdetails_20200201_20200301.csv'
-cleaned_meeting_data = 'cleaned_data.csv'
+# Importing files
 
+# This block checks through the current directory and locates any fies beginning with "meetinglistdetails", then assigns it to the meeting_data variable.
+# The user_file does not need this treatment as it's consistently named.
+folder_content = os.listdir(".")
+regex_pattern = 'meetinglistdetails_*'
+regex = re.compile(regex_pattern)
+
+res = ''
+for path in folder_content:
+    if regex.search(path):
+        res = path
+        break
+
+meeting_data = res
+user_file = 'zoomus_users.csv'
+cleaned_meeting_data = 'cleaned_data.csv'
 
 # Grab the users and their licenses from a zoom output
 # Luckily this report doesn't have a header or blank lines, so I don't have to edit it.
