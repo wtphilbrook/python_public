@@ -112,13 +112,13 @@ reclaimable = []
 for i in userslic.keys():
     if i not in meetings_over_45.keys() and userslic[i] == "Licensed" and i not in usersparts and i in users_this_month:
             reclaimable.append(i)
-            print(i.split('@')[0])
+            print("#",i.split('@')[0])
 print("")
 print("License users who have not used the product during the report period.")
 print("")
 for i in userslic.keys():
     if i not in users_this_month and userslic[i] == "Licensed":
-        print(i.split('@')[0])
+        print("#",i.split('@')[0])
 #Some extra information for the report.
 print("")
 print("Total licenses used in this report: ", liccount)
