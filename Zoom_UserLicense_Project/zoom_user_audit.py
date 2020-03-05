@@ -2,6 +2,7 @@ import csv
 import datetime
 import os
 import re
+import time
 # # # 
 # 
 # The 4 March @ 11:43am EST push has a working script for two of the requirements. I've hand-checked the data to verify.
@@ -105,6 +106,7 @@ fend_date = datetime.datetime(int(end_date[0:4]),int(end_date[4:6]),int(end_date
 print("")
 print("Report covers dates between: ", fstart_date.strftime("%b-%d-%Y"),"to", fend_date.strftime("%b-%d-%Y"))
 print("Report generated from the following file: ", res)
+time.sleep(2)
 print("")
 print("Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants:")
 print("")
