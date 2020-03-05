@@ -61,8 +61,7 @@ with open(user_file) as csvfile:
     userslic = {}
     liccount = 0
     for col in usersCSV:
-        #Column 0 is email, Column 10 is license type
-        userslic.update( {col[0] : col[10]} )
+        userslic.update( {col[0] : col[10]} ) #Column 0 is email, Column 10 is license type
         if col[10] == "Licensed":
             liccount += 1
 
@@ -74,9 +73,12 @@ with open(cleaned_meeting_data) as csvfile:
     meetingCSV = csv.reader(csvfile, delimiter=',')
     next(meetingCSV)
     meetings_over_45 = {}
+    users_this_month = []
     for col in meetingCSV:
         if int(col[10]) > 45:
             meetings_over_45[col[3]] = col[10]
+        users_this_month.append(col[3]) # List of everybody who used Zoom during the report period
+        users_this_month = list( dict.fromkeys(users_this_month)) # Janky way to remove duplicates
 
 # Similar to the above block, check the meeting list and see if a user has meetings with over 3 people. 
 # Skip the first row (headers)
@@ -107,15 +109,23 @@ fstart_date = datetime.datetime(int(start_date[0:4]),int(start_date[4:6]),int(st
 fend_date = datetime.datetime(int(end_date[0:4]),int(end_date[4:6]),int(end_date[6:]))
 print("Report covers dates between: ", fstart_date.strftime("%b-%d-%Y"),"to", fend_date.strftime("%b-%d-%Y"))
 print("")
-print("Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants. \nAlso includes users who have not used Zoom during the range of this report:")
+print("Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants:")
 print("")
 reclaimable = []
 for i in userslic.keys():
     if i not in meetings_over_45.keys():
         if userslic[i] == "Licensed":
             if i not in usersparts:
-                reclaimable.append(i)
-                print(i.split('@')[0])
+                if i in users_this_month:
+                    reclaimable.append(i)
+                    print(i.split('@')[0])
+
+print("")
+print("License users who have not used the product during the report period.")
+print("")
+for i in userslic.keys():
+    if i not in users_this_month and userslic[i] == "Licensed":
+        print(i)
 
 #Some extra information for the report.
 print("")
