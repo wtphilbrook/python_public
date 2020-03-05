@@ -26,35 +26,34 @@ import re
 # # # 
 
 # Importing files
-
 # This block checks through the current directory and locates any fies beginning with "meetinglistdetails", then assigns it to the meeting_data variable.
 # The user_file does not need this treatment as it's consistently named.
 folder_content = os.listdir(".")
 regex_pattern = 'meetinglistdetails_*'
 regex = re.compile(regex_pattern)
-
 res = ''
 for path in folder_content:
     if regex.search(path):
         res = path
         break #only finds the first file, preventing this script from breaking if there is more than one report present. Looks like it always grabs the oldest report.
-
+#
 meeting_data = res
 user_file = 'zoomus_users.csv'
 cleaned_meeting_data = 'cleaned_data.csv'
-
+#
 # Convert the meeting_data csv into the cleaned_meeting_data csv, which removes all blank lines. This also
 # preserves the original CSV in case you need it for some reason.
-
+#
 with open(meeting_data) as in_file:
     with open(cleaned_meeting_data, 'w') as out_file:
         writer = csv.writer(out_file)
         for row in csv.reader(in_file):
             if row:
                 writer.writerow(row)
-
+#
 # Grab the users and their licenses from a zoom output
 # Luckily this report doesn't have a header or blank lines, so I don't have to edit it.
+#
 with open(user_file) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=',')
     userslic = {}
@@ -63,11 +62,11 @@ with open(user_file) as csvfile:
         userslic.update( {col[0] : col[10]} ) #Column 0 is email, Column 10 is license type
         if col[10] == "Licensed":
             liccount += 1
-
+#
 # Grab a list of users and the duration of their zoom meeting.
 # Skip the first row (headers)
 # Find any meeting longer than 45 minutes and create a dict with them and the user's email.
-
+#
 with open(cleaned_meeting_data) as csvfile:
     meetingCSV = csv.reader(csvfile, delimiter=',')
     next(meetingCSV)
@@ -78,11 +77,11 @@ with open(cleaned_meeting_data) as csvfile:
             meetings_over_45[col[3]] = col[10]
         users_this_month.append(col[3]) # List of everybody who used Zoom during the report period
         users_this_month = list( dict.fromkeys(users_this_month)) # Janky way to remove duplicates
-
+#
 # Similar to the above block, check the meeting list and see if a user has meetings with over 3 people. 
 # Skip the first row (headers)
 # If they DO, add them to the usersparts dictionary.
-
+#
 with open(cleaned_meeting_data) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=',')
     usersparts = {}
@@ -91,8 +90,6 @@ with open(cleaned_meeting_data) as csvfile:
         if int(col[11]) > 3:
             #Column 0 is email, Column 10 is license type
             usersparts.update( {col[3] : col[11]} )
-
-
 # 
 # This block will check the list of user licenses versus the list of meetings over 45 minutes.
 # If a user is NOT in the meetings_over_45 dict AND their dict value is Licensed, they are a licensed user
@@ -100,12 +97,11 @@ with open(cleaned_meeting_data) as csvfile:
 #
 # It also prints out the final report, including time and number of licenses used/reclaimable
 # 
-
-print("")
 start_date = meeting_data.split('_')[1]
 end_date = meeting_data.split('_')[2].split('.')[0]
 fstart_date = datetime.datetime(int(start_date[0:4]),int(start_date[4:6]),int(start_date[6:])) 
 fend_date = datetime.datetime(int(end_date[0:4]),int(end_date[4:6]),int(end_date[6:]))
+print("")
 print("Report covers dates between: ", fstart_date.strftime("%b-%d-%Y"),"to", fend_date.strftime("%b-%d-%Y"))
 print("")
 print("Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants:")
@@ -115,14 +111,12 @@ for i in userslic.keys():
     if i not in meetings_over_45.keys() and userslic[i] == "Licensed" and i not in usersparts and i in users_this_month:
             reclaimable.append(i)
             print(i.split('@')[0])
-
 print("")
 print("License users who have not used the product during the report period.")
 print("")
 for i in userslic.keys():
     if i not in users_this_month and userslic[i] == "Licensed":
         print(i)
-
 #Some extra information for the report.
 print("")
 print("Total licenses used in this report: ", liccount)
