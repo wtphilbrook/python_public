@@ -101,8 +101,10 @@ start_date = meeting_data.split('_')[1]
 end_date = meeting_data.split('_')[2].split('.')[0]
 fstart_date = datetime.datetime(int(start_date[0:4]),int(start_date[4:6]),int(start_date[6:])) 
 fend_date = datetime.datetime(int(end_date[0:4]),int(end_date[4:6]),int(end_date[6:]))
+#
 print("")
 print("Report covers dates between: ", fstart_date.strftime("%b-%d-%Y"),"to", fend_date.strftime("%b-%d-%Y"))
+print("Report generated from the following file: ", res)
 print("")
 print("Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants:")
 print("")
@@ -116,7 +118,7 @@ print("License users who have not used the product during the report period.")
 print("")
 for i in userslic.keys():
     if i not in users_this_month and userslic[i] == "Licensed":
-        print(i)
+        print(i.split('@')[0])
 #Some extra information for the report.
 print("")
 print("Total licenses used in this report: ", liccount)
