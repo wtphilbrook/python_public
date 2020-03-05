@@ -112,12 +112,9 @@ print("Licensed Users who do not have any meetings over 45 minutes or with more 
 print("")
 reclaimable = []
 for i in userslic.keys():
-    if i not in meetings_over_45.keys():
-        if userslic[i] == "Licensed":
-            if i not in usersparts:
-                if i in users_this_month:
-                    reclaimable.append(i)
-                    print(i.split('@')[0])
+    if i not in meetings_over_45.keys() and userslic[i] == "Licensed" and i not in usersparts and i in users_this_month:
+            reclaimable.append(i)
+            print(i.split('@')[0])
 
 print("")
 print("License users who have not used the product during the report period.")
