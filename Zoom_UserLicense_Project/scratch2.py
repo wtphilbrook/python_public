@@ -38,7 +38,7 @@ res = ''
 for path in folder_content:
     if regex.search(path):
         res = path
-        break
+        break #only finds the first file, preventing this script from breaking if there is more than one report present. Looks like it always grabs the oldest report.
 
 meeting_data = res
 user_file = 'zoomus_users.csv'
