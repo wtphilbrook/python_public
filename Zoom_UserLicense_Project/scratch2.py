@@ -22,7 +22,7 @@ import re
 # Define a function to edit the incoming CSV and remove blank lines (done)
 # Ignore the header on CSVs (done)
 # I also want to explore using the Zoom API to further automate this, so nobody has to plop scripts in a directory for this to run.
-# Find a better way to input files rather than hardcoding the names in the script.
+# Find a better way to input files rather than hardcoding the names in the script. (done)
 #
 # # # 
 
