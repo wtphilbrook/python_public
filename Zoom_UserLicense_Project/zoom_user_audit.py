@@ -106,7 +106,7 @@ fend_date = datetime.datetime(int(end_date[0:4]),int(end_date[4:6]),int(end_date
 print("")
 print("Report covers dates between: ", fstart_date.strftime("%b-%d-%Y"),"to", fend_date.strftime("%b-%d-%Y"))
 print("Report generated from the following file: ", res)
-time.sleep(2)
+print(input("Press enter to generate report."))
 print("")
 print("Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants:")
 print("")

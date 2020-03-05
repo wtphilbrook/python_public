@@ -44,7 +44,6 @@ with open(cleaned_meeting_data) as csvfile:
     next(usersCSV)
     for col in usersCSV:
         if int(col[11]) > 3:
-
             usersparts.update( {col[3] : col[11]} )
 start_date = meeting_data.split('_')[1]
 end_date = meeting_data.split('_')[2].split('.')[0]
@@ -53,7 +52,7 @@ fend_date = datetime.datetime(int(end_date[0:4]),int(end_date[4:6]),int(end_date
 print("")
 print("Report covers dates between: ", fstart_date.strftime("%b-%d-%Y"),"to", fend_date.strftime("%b-%d-%Y"))
 print("Report generated from the following file: ", res)
-time.sleep(2)
+print(input("Press enter to generate report."))
 print("")
 print("Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants:")
 print("")
@@ -72,8 +71,6 @@ print("")
 print("Total licenses used in this report: ", liccount)
 print("Number of licenses that can be reclaimed from this report: ",len(reclaimable))
 print("")
-
-
 
 
 
