@@ -1,8 +1,4 @@
-import csv
-import datetime
-import os
-import re
-import time
+import csv, datetime, os, re, time
 # # # 
 # 
 # The 4 March @ 11:43am EST push has a working script for two of the requirements. I've hand-checked the data to verify.
@@ -37,6 +33,11 @@ res = []
 for path in folder_content:
     if regex.search(path):
         res.append(path)
+
+# Added a check so a user could see if they're using an outdated version of the licenses files.
+print("")
+print("## License File Information ##")
+print("Using user license information from: ", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(os.path.getmtime('./zoomus_users.csv'))))
 
 for i in res:
     meeting_data = i
@@ -115,6 +116,7 @@ for i in res:
     fend_date = datetime.datetime(int(end_date[0:4]),int(end_date[4:6]),int(end_date[6:]))
     #
     print("")
+    print("## Report file information ##")
     print("Report covers dates between: ", fstart_date.strftime("%b-%d-%Y"),"to", fend_date.strftime("%b-%d-%Y"))
     print("Report generated from the following file: ", i)
     print(input("Press enter to generate report."))
