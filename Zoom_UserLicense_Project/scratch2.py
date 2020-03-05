@@ -44,6 +44,16 @@ meeting_data = res
 user_file = 'zoomus_users.csv'
 cleaned_meeting_data = 'cleaned_data.csv'
 
+# Convert the meeting_data csv into the cleaned_meeting_data csv, which removes all blank lines. This also
+# preserves the original CSV in case you need it for some reason.
+
+with open(meeting_data) as in_file:
+    with open(cleaned_meeting_data, 'w') as out_file:
+        writer = csv.writer(out_file)
+        for row in csv.reader(in_file):
+            if row:
+                writer.writerow(row)
+
 # Grab the users and their licenses from a zoom output
 # Luckily this report doesn't have a header or blank lines, so I don't have to edit it.
 with open(user_file) as csvfile:
@@ -55,16 +65,6 @@ with open(user_file) as csvfile:
         userslic.update( {col[0] : col[10]} )
         if col[10] == "Licensed":
             liccount += 1
-
-# Convert the meeting_data csv into the cleaned_meeting_data csv, which removes all blank lines. This also
-# preserves the original CSV in case you need it for some reason.
-
-with open(meeting_data) as in_file:
-    with open(cleaned_meeting_data, 'w') as out_file:
-        writer = csv.writer(out_file)
-        for row in csv.reader(in_file):
-            if row:
-                writer.writerow(row)
 
 # Grab a list of users and the duration of their zoom meeting.
 # Skip the first row (headers)
