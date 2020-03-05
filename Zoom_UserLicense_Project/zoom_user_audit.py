@@ -44,6 +44,16 @@ cleaned_meeting_data = 'cleaned_data.csv'
 #
 # Convert the meeting_data csv into the cleaned_meeting_data csv, which removes all blank lines. This also
 # preserves the original CSV in case you need it for some reason.
+def clean_csv(incoming_report):
+    with open(incoming_report) as in_file:
+        with open(cleaned_meeting_data, 'w') as out_file:
+            writer = csv.writer(out_file)
+            for row in csv.reader(in_file):
+                if row:
+                    writer.writerow(row)
+#
+clean_csv(meeting_data)
+#
 #
 with open(meeting_data) as in_file:
     with open(cleaned_meeting_data, 'w') as out_file:

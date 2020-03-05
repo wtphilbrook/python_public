@@ -11,15 +11,21 @@ for path in folder_content:
     if regex.search(path):
         res = path
         break
+
 meeting_data = res
 user_file = 'zoomus_users.csv'
 cleaned_meeting_data = 'cleaned_data.csv'
-with open(meeting_data) as in_file:
-    with open(cleaned_meeting_data, 'w') as out_file:
-        writer = csv.writer(out_file)
-        for row in csv.reader(in_file):
-            if row:
-                writer.writerow(row)
+
+def clean_csv(incoming_report):
+    with open(incoming_report) as in_file:
+        with open(cleaned_meeting_data, 'w') as out_file:
+            writer = csv.writer(out_file)
+            for row in csv.reader(in_file):
+                if row:
+                    writer.writerow(row)
+
+clean_csv(meeting_data)
+
 with open(user_file) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=',')
     userslic = {}
