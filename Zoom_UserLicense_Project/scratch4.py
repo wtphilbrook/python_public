@@ -137,20 +137,24 @@ for email in userslic.keys():
     ):
         reclaimable.append(email)
         print("\t", email.split("@")[0])
+print("\t Total: ",len(reclaimable))
 
 # Show licensed users who do not appear in the reports
 print("")
 print("License users who have not used the product during the report period.")
 print("")
+
+user_nouse_count = 0
 for email in userslic.keys():
     if email not in users_this_month and userslic[email] == "Licensed":
         print("\t", email.split("@")[0])
-
+        user_nouse_count += 1
+print("\t Total: ",user_nouse_count)
 
 # Some extra information for the report.
 print("")
-print("Total licenses used in this report: ", liccount)
-print("Number of licenses that can be reclaimed from this report: ", len(reclaimable))
+print("Total licenses used: ", liccount)
+print("Number of licenses that can be reclaimed from this range: ", len(reclaimable))
 print("")
 
 # Clean up after yourself so the report can run clean the next time too
