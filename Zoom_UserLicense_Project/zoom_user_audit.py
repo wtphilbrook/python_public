@@ -54,11 +54,10 @@ def clean_csv(incoming_report):
             for row in csv.reader(in_file):
                 if row:
                     writer.writerow(row)
-
+user_file = "zoomus_users.csv"
+cleaned_meeting_data = "cleaned_data.csv"
 
 for meeting_data in res:
-    user_file = "zoomus_users.csv"
-    cleaned_meeting_data = "cleaned_data.csv"
     clean_csv(meeting_data)
     #
     #
