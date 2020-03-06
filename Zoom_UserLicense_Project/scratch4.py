@@ -1,27 +1,23 @@
+'''
+Zoom User License Audit
+
+The goal of this script is to find which Licensed Zoom users are not using the Licensed functionality.
+This script will pull all meetinglistdetails_*.csv files from the current working directory, format them into a 
+single CSV, and then create lists pairing each user email to:
+- Meetings over 45 minutes
+- Meetings with >3 participants
+It will then produce a report showing users who have not met either of the above requirements.
+It will also show licensed users who have not made any meetings during the report period.
+After running, it will delete the CSV it created.
+
+'''
+
+
 import csv, datetime, os, re, time
 
-# # #
-#
-# The 4 March @ 11:43am EST push has a working script for two of the requirements. I've hand-checked the data to verify.
-#
-# One other small issue is the amount of editing required to make the CSVs work. Blank lines need be removed
-# and the header line needs be removed. That should be easy enough to manipulate at the top of this script.
-# For the time being, I've included the neccessary files in this directory.
-#
-# Here's the plan:
-# Make a list of users who have the licensed version of zoom (done)
-# Make a list of users with meetings over 45 minutes (done)
-# Make a list of users with meetings that have 4+ participants (done)
-# If a licensed user does not fall into either of the two requirement groups, they are not using the
-# functionality (excl outside users, still have to figure that out)
-#
-# To do:
-# Define a function to edit the incoming CSV and remove blank lines (done)
-# Ignore the header on CSVs (done)
-# I also want to explore using the Zoom API to further automate this, so nobody has to plop scripts in a directory for this to run.
-# Find a better way to input files rather than hardcoding the names in the script. (done)
-#
-# # #
+#Define a few file locations
+user_file = "zoomus_users.csv"
+cleaned_meeting_data = "cleaned_data.csv"
 
 # Importing files. Looks specifically for the format that the meetinglistdetails csv's come in. Create a list of all of them in the current dir
 folder_content = os.listdir(".")
@@ -32,9 +28,12 @@ for path in folder_content:
     if regex.search(path):
         res.append(path)
 
-# Convert the meeting_data csv into the cleaned_meeting_data csv, which removes all blank lines. This also
-# preserves the original CSV in case you need it for some reason.
 def clean_csv(incoming_report):
+    '''
+    Go through a list of incoming CSVs. Spin up a new CSV to write to.
+    For each incoming CSV, skip the header row and append its contents to the new CSV.
+    If a line is blank, skip it.
+    '''
     for i in incoming_report:
         with open(i) as in_file:
             with open(cleaned_meeting_data, "a") as out_file:
@@ -43,11 +42,6 @@ def clean_csv(incoming_report):
                 for row in csv.reader(in_file):
                     if row:
                         writer.writerow(row)
-
-user_file = "zoomus_users.csv"
-cleaned_meeting_data = "cleaned_data.csv"
-
-
 
 clean_csv(res)
 
