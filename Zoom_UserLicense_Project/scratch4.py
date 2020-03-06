@@ -46,7 +46,7 @@ def clean_csv(incoming_report):
 
 
 clean_csv(res)
-
+res = sorted(res)
 
 # Generate a dictionary of users and their license type. Also count how many times Licensed appears.
 with open(user_file) as csvfile:
