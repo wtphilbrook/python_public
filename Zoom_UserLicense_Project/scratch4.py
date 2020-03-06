@@ -1,4 +1,4 @@
-'''
+"""
 Zoom User License Audit
 
 The goal of this script is to find which Licensed Zoom users are not using the Licensed functionality.
@@ -10,12 +10,12 @@ It will then produce a report showing users who have not met either of the above
 It will also show licensed users who have not made any meetings during the report period.
 After running, it will delete the CSV it created.
 
-'''
+"""
 
 
 import csv, datetime, os, re, time
 
-#Define a few file locations
+# Define a few file locations
 user_file = "zoomus_users.csv"
 cleaned_meeting_data = "cleaned_data.csv"
 
@@ -28,20 +28,22 @@ for path in folder_content:
     if regex.search(path):
         res.append(path)
 
+
 def clean_csv(incoming_report):
-    '''
+    """
     Go through a list of incoming CSVs. Spin up a new CSV to write to.
     For each incoming CSV, skip the header row and append its contents to the new CSV.
     If a line is blank, skip it.
-    '''
+    """
     for i in incoming_report:
         with open(i) as in_file:
             with open(cleaned_meeting_data, "a") as out_file:
                 writer = csv.writer(out_file)
-                next(in_file) #skip the header row
+                next(in_file)  # skip the header row
                 for row in csv.reader(in_file):
                     if row:
                         writer.writerow(row)
+
 
 clean_csv(res)
 
@@ -57,7 +59,6 @@ with open(user_file) as csvfile:
         )  # Column 0 is email, Column 10 is license type
         if col[10] == "Licensed":
             liccount += 1
-
 
 
 # Make a dictionary of all users with meetings OVER 45 minutes. Also create a list of users who have made meetings in the reports.
@@ -76,7 +77,6 @@ with open(cleaned_meeting_data) as csvfile:
         )  # Janky way to remove duplicates
 
 
-
 # Make a dictionary of all users with meetings containing more than 3 people.
 with open(cleaned_meeting_data) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=",")
@@ -86,15 +86,13 @@ with open(cleaned_meeting_data) as csvfile:
             usersparts.update({col[3]: col[11]})
 
 
-# Create some timestamps. 
+# Create some timestamps.
 start_date = res[0].split("_")[1]
-end_date = res[(len(res)-1)].split("_")[2].split(".")[0]
+end_date = res[(len(res) - 1)].split("_")[2].split(".")[0]
 fstart_date = datetime.datetime(
     int(start_date[0:4]), int(start_date[4:6]), int(start_date[6:])
 )
-fend_date = datetime.datetime(
-    int(end_date[0:4]), int(end_date[4:6]), int(end_date[6:])
-)
+fend_date = datetime.datetime(int(end_date[0:4]), int(end_date[4:6]), int(end_date[6:]))
 #
 
 # Start the report.
@@ -152,9 +150,7 @@ for email in userslic.keys():
 # Some extra information for the report.
 print("")
 print("Total licenses used in this report: ", liccount)
-print(
-    "Number of licenses that can be reclaimed from this report: ", len(reclaimable)
-)
+print("Number of licenses that can be reclaimed from this report: ", len(reclaimable))
 print("")
 
 # Clean up after yourself so the report can run clean the next time too
