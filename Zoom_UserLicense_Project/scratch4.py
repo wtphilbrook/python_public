@@ -23,10 +23,7 @@ import csv, datetime, os, re, time
 #
 # # #
 
-# Importing files
-# This block checks through the current directory and locates any fies beginning with "meetinglistdetails", then assigns it to the meeting_data list.
-# The user_file does not need this treatment as it's consistently named.
-
+# Importing files. Looks specifically for the format that the meetinglistdetails csv's come in. Create a list of all of them in the current dir
 folder_content = os.listdir(".")
 regex_pattern = "meetinglistdetails_*"
 regex = re.compile(regex_pattern)
@@ -35,16 +32,6 @@ for path in folder_content:
     if regex.search(path):
         res.append(path)
 
-# Added a check so a user could see if they're using an outdated version of the licenses files.
-print("")
-print("## License File Information ##")
-print(
-    "Using user license information from: ",
-    time.strftime(
-        "%Y-%m-%d %H:%M:%S", time.localtime(os.path.getmtime("./zoomus_users.csv"))
-    ),
-)
-
 # Convert the meeting_data csv into the cleaned_meeting_data csv, which removes all blank lines. This also
 # preserves the original CSV in case you need it for some reason.
 def clean_csv(incoming_report):
@@ -52,7 +39,7 @@ def clean_csv(incoming_report):
         with open(i) as in_file:
             with open(cleaned_meeting_data, "a") as out_file:
                 writer = csv.writer(out_file)
-                next(in_file)
+                next(in_file) #skip the header row
                 for row in csv.reader(in_file):
                     if row:
                         writer.writerow(row)
@@ -60,12 +47,12 @@ def clean_csv(incoming_report):
 user_file = "zoomus_users.csv"
 cleaned_meeting_data = "cleaned_data.csv"
 
+
+
 clean_csv(res)
-#
-#
-# Grab the users and their licenses from a zoom output
-# Luckily this report doesn't have a header or blank lines, so I don't have to edit it.
-#
+
+
+# Generate a dictionary of users and their license type. Also count how many times Licensed appears.
 with open(user_file) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=",")
     userslic = {}
@@ -76,14 +63,12 @@ with open(user_file) as csvfile:
         )  # Column 0 is email, Column 10 is license type
         if col[10] == "Licensed":
             liccount += 1
-#
-# Grab a list of users and the duration of their zoom meeting.
-# Skip the first row (headers)
-# Find any meeting longer than 45 minutes and create a dict with them and the user's email.
-#
+
+
+
+# Make a dictionary of all users with meetings OVER 45 minutes. Also create a list of users who have made meetings in the reports.
 with open(cleaned_meeting_data) as csvfile:
     meetingCSV = csv.reader(csvfile, delimiter=",")
-    next(meetingCSV)
     meetings_over_45 = {}
     users_this_month = []
     for col in meetingCSV:
@@ -95,28 +80,21 @@ with open(cleaned_meeting_data) as csvfile:
         users_this_month = list(
             dict.fromkeys(users_this_month)
         )  # Janky way to remove duplicates
-#
-# Similar to the above block, check the meeting list and see if a user has meetings with over 3 people.
-# Skip the first row (headers)
-# If they DO, add them to the usersparts dictionary.
-#
+
+
+
+# Make a dictionary of all users with meetings containing more than 3 people.
 with open(cleaned_meeting_data) as csvfile:
     usersCSV = csv.reader(csvfile, delimiter=",")
     usersparts = {}
-    next(usersCSV)
     for col in usersCSV:
         if int(col[11]) > 3:
-            # Column 0 is email, Column 10 is license type
             usersparts.update({col[3]: col[11]})
-#
-# This block will check the list of user licenses versus the list of meetings over 45 minutes.
-# If a user is NOT in the meetings_over_45 dict AND their dict value is Licensed, they are a licensed user
-# not using 1 of the requirements for licensed users.
-#
-# It also prints out the final report, including time and number of licenses used/reclaimable
-#
+
+
+# Create some timestamps. 
 start_date = res[0].split("_")[1]
-end_date = res[2].split("_")[2].split(".")[0]
+end_date = res[(len(res)-1)].split("_")[2].split(".")[0]
 fstart_date = datetime.datetime(
     int(start_date[0:4]), int(start_date[4:6]), int(start_date[6:])
 )
@@ -124,6 +102,20 @@ fend_date = datetime.datetime(
     int(end_date[0:4]), int(end_date[4:6]), int(end_date[6:])
 )
 #
+
+# Start the report.
+
+# License file information
+print("")
+print("## License File Information ##")
+print(
+    "Using user license information from: ",
+    time.strftime(
+        "%Y-%m-%d %H:%M:%S", time.localtime(os.path.getmtime("./zoomus_users.csv"))
+    ),
+)
+
+# Report file information
 print("")
 print("## Report file information ##")
 print(
@@ -133,8 +125,12 @@ print(
     fend_date.strftime("%b-%d-%Y"),
 )
 print("Report generated from the following files: ", res)
+
+# Optional interactive portion, allows the user to see the input before the output
 print(input("Press enter to generate report."))
 print("")
+
+# Compare the dictionaries to the license file and return only those who do not appear in either 45 minutes/+3 users but DO appear on the details report.
 print(
     "Licensed Users who do not have any meetings over 45 minutes or with more than 3 participants:"
 )
@@ -149,12 +145,16 @@ for email in userslic.keys():
     ):
         reclaimable.append(email)
         print("\t", email.split("@")[0])
+
+# Show licensed users who do not appear in the reports
 print("")
 print("License users who have not used the product during the report period.")
 print("")
 for email in userslic.keys():
     if email not in users_this_month and userslic[email] == "Licensed":
         print("\t", email.split("@")[0])
+
+
 # Some extra information for the report.
 print("")
 print("Total licenses used in this report: ", liccount)
@@ -163,17 +163,5 @@ print(
 )
 print("")
 
-
-#
-# This section exists only to comment/uncomment when I want to see how all my dict/lists are outputting.
-#
-# print("userslic")
-# print(userslic)
-# print(type(userslic))
-# print("")
-# #print("license_users")clear
-# #print(license_users)
-# print("")
-# print("meetings_over_45")
-# print(meetings_over_45)
-# print(type(meetings_over_45))
+# Clean up after yourself so the report can run clean the next time too
+os.remove(cleaned_meeting_data)
